@@ -49,7 +49,7 @@ function PricesPage() {
     setLoading(true);
     let q = supabase
       .from("price_entries")
-      .select("id, price, unit, date_submitted, produce:produce_id(name), market:market_id(name, location), profile:user_id(name)")
+      .select("id, price, unit, date_submitted, produce:produce_id(name), market:market_id(name, location)")
       .order("date_submitted", { ascending: false })
       .limit(200);
     if (marketFilter) q = q.eq("market_id", marketFilter);

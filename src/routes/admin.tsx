@@ -24,7 +24,7 @@ function Admin() {
 
   const load = () => {
     supabase.from("price_entries")
-      .select("id, price, date_submitted, produce:produce_id(name), market:market_id(name), profile:user_id(name, email)")
+      .select("id, price, date_submitted, produce:produce_id(name), market:market_id(name)")
       .order("date_submitted", { ascending: false }).limit(100)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .then(({ data }) => setEntries(((data as any) ?? []) as Entry[]));
@@ -64,7 +64,7 @@ function Admin() {
                     <td className="px-5 py-3 font-medium">{e.produce?.name}</td>
                     <td className="px-5 py-3">{e.market?.name}</td>
                     <td className="px-5 py-3 font-mono">UGX {Number(e.price).toLocaleString()}</td>
-                    <td className="px-5 py-3 text-muted-foreground">{e.profile?.name ?? e.profile?.email}</td>
+                    <td className="px-5 py-3 text-muted-foreground">—</td>
                     <td className="px-5 py-3 text-muted-foreground">{new Date(e.date_submitted).toLocaleDateString()}</td>
                     <td className="px-5 py-3 text-right"><button onClick={() => delEntry(e.id)} className="text-xs px-3 py-1.5 text-destructive border border-destructive/40 rounded hover:bg-destructive/10 transition-colors duration-200">Delete</button></td>
                   </tr>
