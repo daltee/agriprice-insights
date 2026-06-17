@@ -9,7 +9,14 @@ export const Route = createFileRoute("/admin")({
   component: Admin,
 });
 
-type Entry = { id: string; price: number; date_submitted: string; produce: { name: string } | null; market: { name: string } | null; profile: { name: string; email: string } | null };
+type Entry = {
+  id: string;
+  price: number;
+  date_submitted: string;
+  produce: { name: string } | null;
+  market: { name: string } | null;
+  profile: { name: string; email: string } | null;
+};
 type Profile = { id: string; name: string; email: string; role: string; created_at: string };
 
 function Admin() {
@@ -23,12 +30,17 @@ function Admin() {
   }, [role, navigate]);
 
   const load = () => {
-    supabase.from("price_entries")
+    supabase
+      .from("price_entries")
       .select("id, price, date_submitted, produce:produce_id(name), market:market_id(name)")
-      .order("date_submitted", { ascending: false }).limit(100)
+      .order("date_submitted", { ascending: false })
+      .limit(100)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .then(({ data }) => setEntries(((data as any) ?? []) as Entry[]));
-    supabase.from("profiles").select("id, name, email, role, created_at").order("created_at", { ascending: false })
+    supabase
+      .from("profiles")
+      .select("id, name, email, role, created_at")
+      .order("created_at", { ascending: false })
       .then(({ data }) => setUsers((data as Profile[]) ?? []));
   };
   useEffect(load, []);
@@ -40,7 +52,11 @@ function Admin() {
   }
 
   if (role !== "admin") {
-    return <DashboardShell><div className="p-10 text-muted-foreground">Checking admin access…</div></DashboardShell>;
+    return (
+      <DashboardShell>
+        <div className="p-10 text-muted-foreground">Checking admin access…</div>
+      </DashboardShell>
+    );
   }
 
   return (
@@ -56,17 +72,36 @@ function Admin() {
           <div className="bg-card border border-border rounded-md overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-muted/60 text-left">
-                <tr><th className="px-5 py-3 font-medium">Produce</th><th className="px-5 py-3 font-medium">Market</th><th className="px-5 py-3 font-medium">Price</th><th className="px-5 py-3 font-medium">By</th><th className="px-5 py-3 font-medium">Date</th><th></th></tr>
+                <tr>
+                  <th className="px-5 py-3 font-medium">Produce</th>
+                  <th className="px-5 py-3 font-medium">Market</th>
+                  <th className="px-5 py-3 font-medium">Price</th>
+                  <th className="px-5 py-3 font-medium">By</th>
+                  <th className="px-5 py-3 font-medium">Date</th>
+                  <th></th>
+                </tr>
               </thead>
               <tbody>
-                {entries.map(e => (
-                  <tr key={e.id} className="border-t border-border hover:bg-green-soft transition-colors duration-150">
+                {entries.map((e) => (
+                  <tr
+                    key={e.id}
+                    className="border-t border-border hover:bg-green-soft transition-colors duration-150"
+                  >
                     <td className="px-5 py-3 font-medium">{e.produce?.name}</td>
                     <td className="px-5 py-3">{e.market?.name}</td>
                     <td className="px-5 py-3 font-mono">UGX {Number(e.price).toLocaleString()}</td>
                     <td className="px-5 py-3 text-muted-foreground">—</td>
-                    <td className="px-5 py-3 text-muted-foreground">{new Date(e.date_submitted).toLocaleDateString()}</td>
-                    <td className="px-5 py-3 text-right"><button onClick={() => delEntry(e.id)} className="text-xs px-3 py-1.5 text-destructive border border-destructive/40 rounded hover:bg-destructive/10 transition-colors duration-200">Delete</button></td>
+                    <td className="px-5 py-3 text-muted-foreground">
+                      {new Date(e.date_submitted).toLocaleDateString()}
+                    </td>
+                    <td className="px-5 py-3 text-right">
+                      <button
+                        onClick={() => delEntry(e.id)}
+                        className="text-xs px-3 py-1.5 text-destructive border border-destructive/40 rounded hover:bg-destructive/10 transition-colors duration-200"
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -79,15 +114,24 @@ function Admin() {
           <div className="bg-card border border-border rounded-md overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-muted/60 text-left">
-                <tr><th className="px-5 py-3 font-medium">Name</th><th className="px-5 py-3 font-medium">Email</th><th className="px-5 py-3 font-medium">Role</th><th className="px-5 py-3 font-medium">Joined</th></tr>
+                <tr>
+                  <th className="px-5 py-3 font-medium">Name</th>
+                  <th className="px-5 py-3 font-medium">Email</th>
+                  <th className="px-5 py-3 font-medium">Role</th>
+                  <th className="px-5 py-3 font-medium">Joined</th>
+                </tr>
               </thead>
               <tbody>
-                {users.map(u => (
+                {users.map((u) => (
                   <tr key={u.id} className="border-t border-border">
                     <td className="px-5 py-3 font-medium">{u.name}</td>
                     <td className="px-5 py-3 text-muted-foreground">{u.email}</td>
-                    <td className="px-5 py-3 capitalize"><span className="px-2 py-0.5 text-xs rounded bg-muted">{u.role}</span></td>
-                    <td className="px-5 py-3 text-muted-foreground">{new Date(u.created_at).toLocaleDateString()}</td>
+                    <td className="px-5 py-3 capitalize">
+                      <span className="px-2 py-0.5 text-xs rounded bg-muted">{u.role}</span>
+                    </td>
+                    <td className="px-5 py-3 text-muted-foreground">
+                      {new Date(u.created_at).toLocaleDateString()}
+                    </td>
                   </tr>
                 ))}
               </tbody>

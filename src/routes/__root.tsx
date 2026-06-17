@@ -78,10 +78,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "AgriPrice — Daily market prices for Mbarara & Masaka" },
-      { name: "description", content: "Track daily farm produce prices in Mbarara and Masaka markets. Built for farmers, vendors and buyers in Uganda." },
+      {
+        name: "description",
+        content:
+          "Track daily farm produce prices in Mbarara and Masaka markets. Built for farmers, vendors and buyers in Uganda.",
+      },
       { name: "author", content: "AgriPrice" },
       { property: "og:title", content: "AgriPrice — Know the price before you go" },
-      { property: "og:description", content: "Daily farm produce prices for markets in Mbarara and Masaka, Uganda." },
+      {
+        property: "og:description",
+        content: "Daily farm produce prices for markets in Mbarara and Masaka, Uganda.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
