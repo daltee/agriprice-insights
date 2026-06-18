@@ -26,6 +26,9 @@ export function PriceTicker() {
             price: Number(d.price),
           })),
         );
+      })
+      .catch((error) => {
+        console.error(error);
       });
   }, []);
 
