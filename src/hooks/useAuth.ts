@@ -29,12 +29,19 @@ export function useUserRole() {
   const { user } = useAuth();
   const [role, setRole] = useState<AppRole | null>(null);
   useEffect(() => {
-    if (!user) { setRole(null); return; }
-    supabase.from("user_roles").select("role").eq("user_id", user.id).then(({ data }) => {
-      if (data?.some(r => r.role === "admin")) setRole("admin");
-      else if (data?.some(r => r.role === "vendor")) setRole("vendor");
-      else setRole("farmer");
-    });
+    if (!user) {
+      setRole(null);
+      return;
+    }
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .then(({ data }) => {
+        if (data?.some((r) => r.role === "admin")) setRole("admin");
+        else if (data?.some((r) => r.role === "vendor")) setRole("vendor");
+        else setRole("farmer");
+      });
   }, [user]);
   return role;
 }

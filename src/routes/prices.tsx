@@ -8,9 +8,15 @@ export const Route = createFileRoute("/prices")({
   head: () => ({
     meta: [
       { title: "Today's Prices — AgriPrice" },
-      { name: "description", content: "Browse current produce prices across Mbarara and Masaka markets." },
+      {
+        name: "description",
+        content: "Browse current produce prices across Mbarara and Masaka markets.",
+      },
       { property: "og:title", content: "Today's Prices — AgriPrice" },
-      { property: "og:description", content: "Browse current produce prices across Mbarara and Masaka markets." },
+      {
+        property: "og:description",
+        content: "Browse current produce prices across Mbarara and Masaka markets.",
+      },
     ],
   }),
   component: PricesPage,
@@ -23,7 +29,7 @@ type Row = {
   date_submitted: string;
   produce: { name: string } | null;
   market: { name: string; location: string } | null;
-  profile: { name: string } | null;
+  profile?: { name: string } | null;
 };
 
 function PricesPage() {
@@ -49,7 +55,9 @@ function PricesPage() {
     setLoading(true);
     let q = supabase
       .from("price_entries")
-      .select("id, price, unit, date_submitted, produce:produce_id(name), market:market_id(name, location)")
+      .select(
+        "id, price, unit, date_submitted, produce:produce_id(name), market:market_id(name, location)",
+      )
       .order("date_submitted", { ascending: false })
       .limit(200);
     if (marketFilter) q = q.eq("market_id", marketFilter);
@@ -60,8 +68,11 @@ function PricesPage() {
       end.setDate(end.getDate() + 1);
       q = q.gte("date_submitted", start.toISOString()).lt("date_submitted", end.toISOString());
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    q.then(({ data }) => { setRows((data as any) ?? []); setLoading(false); });
+    q.then(({ data }) => {
+      setRows((data as Row[]) ?? []);
+    }).finally(() => {
+      setLoading(false);
+    });
   }, [marketFilter, produceFilter, dateFilter]);
 
   const summary = useMemo(() => {
@@ -78,20 +89,52 @@ function PricesPage() {
         <div className="mx-auto max-w-7xl px-6 py-12">
           <h1 className="text-3xl md:text-4xl mb-2">Today's market prices</h1>
           <p className="text-muted-foreground mb-8">
-            {summary ? `${summary.count} entries · average UGX ${Math.round(summary.avg).toLocaleString()}/kg` : "Loading entries…"}
+            {summary
+              ? `${summary.count} entries · average UGX ${Math.round(summary.avg).toLocaleString()}/kg`
+              : "Loading entries…"}
           </p>
 
           <div className="bg-card border border-border rounded-md p-4 mb-6 grid sm:grid-cols-4 gap-3">
-            <select value={marketFilter} onChange={e => setMarketFilter(e.target.value)} className="bg-background border border-border rounded-md px-3 py-2 text-sm">
+            <select
+              value={marketFilter}
+              onChange={(e) => setMarketFilter(e.target.value)}
+              className="bg-background border border-border rounded-md px-3 py-2 text-sm"
+            >
               <option value="">All markets</option>
-              {markets.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+              {markets.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                </option>
+              ))}
             </select>
-            <select value={produceFilter} onChange={e => setProduceFilter(e.target.value)} className="bg-background border border-border rounded-md px-3 py-2 text-sm">
+            <select
+              value={produceFilter}
+              onChange={(e) => setProduceFilter(e.target.value)}
+              className="bg-background border border-border rounded-md px-3 py-2 text-sm"
+            >
               <option value="">All produce</option>
-              {produce.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+              {produce.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
             </select>
-            <input type="date" value={dateFilter} onChange={e => setDateFilter(e.target.value)} className="bg-background border border-border rounded-md px-3 py-2 text-sm" />
-            <button onClick={() => { setMarketFilter(""); setProduceFilter(""); setDateFilter(""); }} className="text-sm border border-border rounded-md px-3 py-2 hover:bg-muted transition-colors duration-200">Reset filters</button>
+            <input
+              type="date"
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="bg-background border border-border rounded-md px-3 py-2 text-sm"
+            />
+            <button
+              onClick={() => {
+                setMarketFilter("");
+                setProduceFilter("");
+                setDateFilter("");
+              }}
+              className="text-sm border border-border rounded-md px-3 py-2 hover:bg-muted transition-colors duration-200"
+            >
+              Reset filters
+            </button>
           </div>
 
           <div className="bg-card border border-border rounded-md overflow-hidden">
@@ -107,22 +150,39 @@ function PricesPage() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={5} className="px-5 py-10 text-center text-muted-foreground">Loading…</td></tr>
-                ) : rows.length === 0 ? (
-                  <tr><td colSpan={5} className="px-5 py-10 text-center text-muted-foreground">No entries match those filters.</td></tr>
-                ) : rows.map((r, i) => (
-                  <tr
-                    key={r.id}
-                    className="row-fade border-t border-border hover:bg-green-soft transition-colors duration-150"
-                    style={{ animationDelay: `${Math.min(i, 30) * 80}ms` }}
-                  >
-                    <td className="px-5 py-3 font-medium">{r.produce?.name}</td>
-                    <td className="px-5 py-3 font-mono">{Number(r.price).toLocaleString()}</td>
-                    <td className="px-5 py-3">{r.market?.name} <span className="text-muted-foreground text-xs">· {r.market?.location}</span></td>
-                    <td className="px-5 py-3 text-muted-foreground">{r.profile?.name ?? "—"}</td>
-                    <td className="px-5 py-3 text-muted-foreground">{new Date(r.date_submitted).toLocaleDateString()}</td>
+                  <tr>
+                    <td colSpan={5} className="px-5 py-10 text-center text-muted-foreground">
+                      Loading…
+                    </td>
                   </tr>
-                ))}
+                ) : rows.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-5 py-10 text-center text-muted-foreground">
+                      No entries match those filters.
+                    </td>
+                  </tr>
+                ) : (
+                  rows.map((r, i) => (
+                    <tr
+                      key={r.id}
+                      className="row-fade border-t border-border hover:bg-green-soft transition-colors duration-150"
+                      style={{ animationDelay: `${Math.min(i, 30) * 80}ms` }}
+                    >
+                      <td className="px-5 py-3 font-medium">{r.produce?.name}</td>
+                      <td className="px-5 py-3 font-mono">{Number(r.price).toLocaleString()}</td>
+                      <td className="px-5 py-3">
+                        {r.market?.name}{" "}
+                        <span className="text-muted-foreground text-xs">
+                          · {r.market?.location}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 text-muted-foreground">{r.profile?.name ?? "—"}</td>
+                      <td className="px-5 py-3 text-muted-foreground">
+                        {new Date(r.date_submitted).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
