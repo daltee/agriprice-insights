@@ -11,25 +11,29 @@ type TickRow = {
 export function PriceTicker() {
   const [ticks, setTicks] = useState<Tick[]>([]);
   useEffect(() => {
-    supabase
-      .from("price_entries")
-      .select("price, produce:produce_id(name), market:market_id(name)")
-      .order("date_submitted", { ascending: false })
-      .limit(20)
-      .then(({ data }) => {
-        if (!data) return;
-        const rows = data as TickRow[];
-        setTicks(
-          rows.map((d) => ({
-            produce: d.produce?.name ?? "",
-            market: d.market?.name ?? "",
-            price: Number(d.price),
-          })),
-        );
-      })
-      .catch((error) => {
+    async function loadTicks() {
+      const { data, error } = await supabase
+        .from("price_entries")
+        .select("price, produce:produce_id(name), market:market_id(name)")
+        .order("date_submitted", { ascending: false })
+        .limit(20);
+
+      if (error) {
         console.error(error);
-      });
+        return;
+      }
+
+      const rows = (data ?? []) as TickRow[];
+      setTicks(
+        rows.map((d) => ({
+          produce: d.produce?.name ?? "",
+          market: d.market?.name ?? "",
+          price: Number(d.price),
+        })),
+      );
+    }
+
+    void loadTicks();
   }, []);
 
   const items = ticks.length ? [...ticks, ...ticks] : [];

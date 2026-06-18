@@ -53,26 +53,37 @@ function PricesPage() {
 
   useEffect(() => {
     setLoading(true);
-    let q = supabase
-      .from("price_entries")
-      .select(
-        "id, price, unit, date_submitted, produce:produce_id(name), market:market_id(name, location)",
-      )
-      .order("date_submitted", { ascending: false })
-      .limit(200);
-    if (marketFilter) q = q.eq("market_id", marketFilter);
-    if (produceFilter) q = q.eq("produce_id", produceFilter);
-    if (dateFilter) {
-      const start = new Date(dateFilter);
-      const end = new Date(start);
-      end.setDate(end.getDate() + 1);
-      q = q.gte("date_submitted", start.toISOString()).lt("date_submitted", end.toISOString());
+    let cancelled = false;
+
+    async function loadRows() {
+      let q = supabase
+        .from("price_entries")
+        .select(
+          "id, price, unit, date_submitted, produce:produce_id(name), market:market_id(name, location)",
+        )
+        .order("date_submitted", { ascending: false })
+        .limit(200);
+      if (marketFilter) q = q.eq("market_id", marketFilter);
+      if (produceFilter) q = q.eq("produce_id", produceFilter);
+      if (dateFilter) {
+        const start = new Date(dateFilter);
+        const end = new Date(start);
+        end.setDate(end.getDate() + 1);
+        q = q.gte("date_submitted", start.toISOString()).lt("date_submitted", end.toISOString());
+      }
+
+      const { data, error } = await q;
+      if (!cancelled) {
+        if (error) console.error(error);
+        setRows((data as Row[]) ?? []);
+        setLoading(false);
+      }
     }
-    q.then(({ data }) => {
-      setRows((data as Row[]) ?? []);
-    }).finally(() => {
-      setLoading(false);
-    });
+
+    void loadRows();
+    return () => {
+      cancelled = true;
+    };
   }, [marketFilter, produceFilter, dateFilter]);
 
   const summary = useMemo(() => {
