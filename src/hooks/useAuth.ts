@@ -10,26 +10,40 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+    const failSafe = window.setTimeout(() => {
+      if (!cancelled) setLoading(false);
+    }, 5000);
+
     try {
       const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+        if (cancelled) return;
         setSession(s);
         setUser(s?.user ?? null);
+        setLoading(false);
       });
       supabase.auth
         .getSession()
         .then(({ data }) => {
+          if (cancelled) return;
           setSession(data.session);
           setUser(data.session?.user ?? null);
           setLoading(false);
         })
         .catch((error) => {
+          if (cancelled) return;
           console.error(error);
           setLoading(false);
         });
-      return () => sub.subscription.unsubscribe();
+      return () => {
+        cancelled = true;
+        window.clearTimeout(failSafe);
+        sub.subscription.unsubscribe();
+      };
     } catch (error) {
       console.error(error);
       setLoading(false);
+      window.clearTimeout(failSafe);
       return;
     }
   }, []);
