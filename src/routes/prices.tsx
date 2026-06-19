@@ -149,53 +149,55 @@ function PricesPage() {
           </div>
 
           <div className="bg-card border border-border rounded-md overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/60 text-left">
-                <tr>
-                  <th className="px-5 py-3 font-medium">Produce</th>
-                  <th className="px-5 py-3 font-medium">Price (UGX/kg)</th>
-                  <th className="px-5 py-3 font-medium">Market</th>
-                  <th className="px-5 py-3 font-medium">Submitted by</th>
-                  <th className="px-5 py-3 font-medium">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm min-w-[600px] sm:min-w-0">
+                <thead className="bg-muted/60 text-left">
                   <tr>
-                    <td colSpan={5} className="px-5 py-10 text-center text-muted-foreground">
-                      Loading…
-                    </td>
+                    <th className="px-5 py-3 font-medium">Produce</th>
+                    <th className="px-5 py-3 font-medium">Price (UGX/kg)</th>
+                    <th className="px-5 py-3 font-medium">Market</th>
+                    <th className="px-5 py-3 font-medium hidden sm:table-cell">Submitted by</th>
+                    <th className="px-5 py-3 font-medium">Date</th>
                   </tr>
-                ) : rows.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="px-5 py-10 text-center text-muted-foreground">
-                      No entries match those filters.
-                    </td>
-                  </tr>
-                ) : (
-                  rows.map((r, i) => (
-                    <tr
-                      key={r.id}
-                      className="row-fade border-t border-border hover:bg-green-soft transition-colors duration-150"
-                      style={{ animationDelay: `${Math.min(i, 30) * 80}ms` }}
-                    >
-                      <td className="px-5 py-3 font-medium">{r.produce?.name}</td>
-                      <td className="px-5 py-3 font-mono">{Number(r.price).toLocaleString()}</td>
-                      <td className="px-5 py-3">
-                        {r.market?.name}{" "}
-                        <span className="text-muted-foreground text-xs">
-                          · {r.market?.location}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3 text-muted-foreground">{r.profile?.name ?? "—"}</td>
-                      <td className="px-5 py-3 text-muted-foreground">
-                        {new Date(r.date_submitted).toLocaleDateString()}
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr>
+                      <td colSpan={5} className="px-5 py-10 text-center text-muted-foreground">
+                        Loading…
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : rows.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-5 py-10 text-center text-muted-foreground">
+                        No entries match those filters.
+                      </td>
+                    </tr>
+                  ) : (
+                    rows.map((r, i) => (
+                      <tr
+                        key={r.id}
+                        className="row-fade border-t border-border hover:bg-green-soft transition-colors duration-150"
+                        style={{ animationDelay: `${Math.min(i, 30) * 80}ms` }}
+                      >
+                        <td className="px-5 py-3 font-medium">{r.produce?.name}</td>
+                        <td className="px-5 py-3 font-mono font-semibold text-primary">{Number(r.price).toLocaleString()}</td>
+                        <td className="px-5 py-3">
+                          {r.market?.name}{" "}
+                          <span className="text-muted-foreground text-xs block sm:inline">
+                            {r.market?.location ? `· ${r.market.location}` : ""}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3 text-muted-foreground hidden sm:table-cell">{r.profile?.name ?? "—"}</td>
+                        <td className="px-5 py-3 text-muted-foreground">
+                          {new Date(r.date_submitted).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </main>

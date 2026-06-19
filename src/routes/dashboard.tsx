@@ -243,84 +243,88 @@ function Dashboard() {
           <div className="px-6 py-4 border-b border-border">
             <h2 className="text-xl">Your submissions</h2>
           </div>
-          <table className="w-full text-sm">
-            <thead className="bg-muted/60 text-left">
-              <tr>
-                <th className="px-5 py-3 font-medium">Produce</th>
-                <th className="px-5 py-3 font-medium">Market</th>
-                <th className="px-5 py-3 font-medium">Price</th>
-                <th className="px-5 py-3 font-medium">Date</th>
-                <th className="px-5 py-3 font-medium text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mine.length === 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[500px] sm:min-w-0">
+              <thead className="bg-muted/60 text-left">
                 <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-muted-foreground">
-                    You haven't submitted any prices yet.
-                  </td>
+                  <th className="px-5 py-3 font-medium">Produce</th>
+                  <th className="px-5 py-3 font-medium">Market</th>
+                  <th className="px-5 py-3 font-medium">Price</th>
+                  <th className="px-5 py-3 font-medium hidden sm:table-cell">Date</th>
+                  <th className="px-5 py-3 font-medium text-right">Actions</th>
                 </tr>
-              ) : (
-                mine.map((r) => (
-                  <tr
-                    key={r.id}
-                    className="border-t border-border hover:bg-green-soft transition-colors duration-150"
-                  >
-                    <td className="px-5 py-3 font-medium">{r.produce?.name}</td>
-                    <td className="px-5 py-3">{r.market?.name}</td>
-                    <td className="px-5 py-3 font-mono">
-                      {editPrice?.id === r.id ? (
-                        <input
-                          autoFocus
-                          value={editPrice.value}
-                          onChange={(e) => setEditPrice({ id: r.id, value: e.target.value })}
-                          className="w-24 bg-background border border-border rounded px-2 py-1 text-sm"
-                        />
-                      ) : (
-                        `UGX ${Number(r.price).toLocaleString()}`
-                      )}
-                    </td>
-                    <td className="px-5 py-3 text-muted-foreground">
-                      {new Date(r.date_submitted).toLocaleDateString()}
-                    </td>
-                    <td className="px-5 py-3 text-right space-x-2">
-                      {editPrice?.id === r.id ? (
-                        <>
-                          <button
-                            onClick={saveEdit}
-                            className="text-xs px-3 py-1.5 bg-primary text-gold rounded hover:bg-primary/85 transition-colors duration-200"
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={() => setEditPrice(null)}
-                            className="text-xs px-3 py-1.5 border border-border rounded hover:bg-muted transition-colors duration-200"
-                          >
-                            Cancel
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => setEditPrice({ id: r.id, value: String(r.price) })}
-                            className="text-xs px-3 py-1.5 border border-border rounded hover:bg-muted transition-colors duration-200"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => del(r.id)}
-                            className="text-xs px-3 py-1.5 text-destructive border border-destructive/40 rounded hover:bg-destructive/10 transition-colors duration-200"
-                          >
-                            Delete
-                          </button>
-                        </>
-                      )}
+              </thead>
+              <tbody>
+                {mine.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-5 py-10 text-center text-muted-foreground">
+                      You haven't submitted any prices yet.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  mine.map((r) => (
+                    <tr
+                      key={r.id}
+                      className="border-t border-border hover:bg-green-soft transition-colors duration-150"
+                    >
+                      <td className="px-5 py-3 font-medium">{r.produce?.name}</td>
+                      <td className="px-5 py-3">{r.market?.name}</td>
+                      <td className="px-5 py-3 font-mono">
+                        {editPrice?.id === r.id ? (
+                          <input
+                            autoFocus
+                            value={editPrice.value}
+                            onChange={(e) => setEditPrice({ id: r.id, value: e.target.value })}
+                            className="w-24 bg-background border border-border rounded px-2 py-1 text-sm"
+                          />
+                        ) : (
+                          `UGX ${Number(r.price).toLocaleString()}`
+                        )}
+                      </td>
+                      <td className="px-5 py-3 text-muted-foreground hidden sm:table-cell">
+                        {new Date(r.date_submitted).toLocaleDateString()}
+                      </td>
+                      <td className="px-5 py-3 text-right">
+                        <div className="flex justify-end gap-2">
+                          {editPrice?.id === r.id ? (
+                            <>
+                              <button
+                                onClick={saveEdit}
+                                className="text-xs px-3 py-1.5 bg-primary text-gold rounded hover:bg-primary/85 transition-colors duration-200"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={() => setEditPrice(null)}
+                                className="text-xs px-3 py-1.5 border border-border rounded hover:bg-muted transition-colors duration-200"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => setEditPrice({ id: r.id, value: String(r.price) })}
+                                className="text-xs px-3 py-1.5 border border-border rounded hover:bg-muted transition-colors duration-200"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => del(r.id)}
+                                className="text-xs px-3 py-1.5 text-destructive border border-destructive/40 rounded hover:bg-destructive/10 transition-colors duration-200"
+                              >
+                                Delete
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </DashboardShell>
