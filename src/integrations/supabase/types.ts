@@ -84,40 +84,61 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          image_url: string | null
           name: string
+          slug: string | null
         }
         Insert: {
           created_at?: string
           id?: string
+          image_url?: string | null
           name: string
+          slug?: string | null
         }
         Update: {
           created_at?: string
           id?: string
+          image_url?: string | null
           name?: string
+          slug?: string | null
         }
         Relationships: []
       }
       profiles: {
         Row: {
+          country_code: string | null
           created_at: string
           email: string
           id: string
+          location_label: string | null
+          location_lat: number | null
+          location_lng: number | null
           name: string
+          phone: string | null
           role: Database["public"]["Enums"]["app_role"]
         }
         Insert: {
+          country_code?: string | null
           created_at?: string
           email: string
           id: string
+          location_label?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           name: string
+          phone?: string | null
           role?: Database["public"]["Enums"]["app_role"]
         }
         Update: {
+          country_code?: string | null
           created_at?: string
           email?: string
           id?: string
+          location_label?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           name?: string
+          phone?: string | null
           role?: Database["public"]["Enums"]["app_role"]
         }
         Relationships: []
