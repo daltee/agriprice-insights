@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { LocationCard } from "@/components/LocationCard";
 import {
   LineChart,
   Line,
@@ -141,6 +142,7 @@ function Dashboard() {
         <p className="text-muted-foreground mb-8">
           A quick read on your contributions and market movement this week.
         </p>
+        <LocationCard />
 
         <div className="grid md:grid-cols-3 gap-6 mb-10">
           {[

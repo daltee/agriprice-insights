@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
-import { PriceTicker } from "@/components/PriceTicker";
+import { MarketPulse } from "@/components/MarketPulse";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/prices")({
@@ -95,7 +95,7 @@ function PricesPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <PriceTicker />
+      <MarketPulse />
       <main className="flex-1 bg-background">
         <div className="mx-auto max-w-7xl px-6 py-12">
           <h1 className="text-3xl md:text-4xl mb-2">Today's market prices</h1>
